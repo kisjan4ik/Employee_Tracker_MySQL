@@ -6,7 +6,7 @@ const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "root",
-    database: "employee_db",
+    database: "company_db",
     port: 3306
 });
 
@@ -15,6 +15,10 @@ connection.connect((err) => {
 
     startApp();
 });
+
+function startApp() {
+    inquirer.prompt ()
+}
 
 
 connection.end();
