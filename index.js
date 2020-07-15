@@ -129,3 +129,28 @@ function viewByDepartm() {
                 })
         }
 
+// function to view employees by role
+function viewByRole(){
+    inquirer.prompt({
+        name: "roles",
+        type: "list",
+        message: "Employees with what Role do you want to see?",
+        choices: [
+            "Sales Lead",
+            "Salesperson",
+            "Accountant",
+            "Legal Team Lead",
+            "Lawyer",
+            "Lead Engineer",
+            "Software Engineer"
+        ]
+    })
+        .then(answers => {
+                    connection.query("SELECT employee.first_name, employee.last_name, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.roles_id = roles.id LEFT JOIN department ON roles.department_id = department.id WHERE roles.title = ?", [answers.roles],
+                    (err, results) => {
+                        if (err) throw err;
+                        console.table(results);
+                        start();
+                    })
+                })
+        }
