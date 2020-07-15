@@ -24,9 +24,11 @@ function start() {
         type: "list",
         message: "What would you like to do?",
         choices: [
-            "- Viev All Employees",
-            "- Viev All Employees by Department",
-            "- Viev All Employees by Role",
+            "- View Departments",
+            "- View Roles",
+            "- View All Employees",
+            "- View All Employees by Department",
+            "- View All Employees by Role",
             "- Add Employee",
             "- Add Role",
             "- Add Department",
@@ -38,13 +40,19 @@ function start() {
         .then(answers => {
             // Create code that creates a new employee object based off the employee class and pushes it to the teamArray.
             switch (answers.options) {
-                case "- Viev All Employees":
+                case "- View Departments":
+                    viewDepts();
+                    break;
+                case "- View Roles":
+                    viewRoles();
+                    break;
+                case "- View All Employees":
                     viewEmployees();
                     break;
-                case "- Viev All Employees by Department":
+                case "- View All Employees by Department":
                     viewByDepartm();
                     break;
-                case "- Viev All Employees by Role":
+                case "- View All Employees by Role":
                     viewByRole();
                     break;
                 case "- Add Employee":
@@ -66,11 +74,38 @@ function start() {
         })
 }
 
+// Function to view all Departments
+function viewDepts() {
+    connection.query("SELECT * from department", (err, results) => {
+        if (err) throw err;
+        console.table(results);
+        start();
+
+    })
+}
+
+// Function to view Roless
+function viewRoles() {
+    connection.query("SELECT roles.title, roles.salary, department.name FROM roles LEFT JOIN department ON roles.department_id = department.id",
+        (err, results) => {
+            if (err) throw err;
+            console.table(results)
+            start();
+
+        })
+}
+
 // Function to view all Employees
 function viewEmployees() {
-connection.query("SELECT * from employee", (err, results) => {
-    if (err) throw err;
-    console.table(results);
-    start();
-})
+    connection.query("SELECT employee.first_name, employee.last_name, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id",
+        (err, results) => {
+            if (err) throw err;
+            console.table(results);
+            start();
+
+        })
 }
+
+
+
+
