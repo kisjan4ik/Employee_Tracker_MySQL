@@ -27,8 +27,8 @@ function start() {
             "- View Departments",
             "- View Roles",
             "- View All Employees",
-            "- View All Employees by Department",
-            "- View All Employees by Role",
+            "- View Employees by Department",
+            "- View Employees by Role",
             "- Add Employee",
             "- Add Role",
             "- Add Department",
@@ -49,10 +49,10 @@ function start() {
                 case "- View All Employees":
                     viewEmployees();
                     break;
-                case "- View All Employees by Department":
+                case "- View Employees by Department":
                     viewByDepartm();
                     break;
-                case "- View All Employees by Role":
+                case "- View Employees by Role":
                     viewByRole();
                     break;
                 case "- Add Employee":
@@ -74,7 +74,7 @@ function start() {
         })
 }
 
-// Function to view all Departments
+// Function to view  Departments
 function viewDepts() {
     connection.query("SELECT * from department", (err, results) => {
         if (err) throw err;
@@ -97,15 +97,35 @@ function viewRoles() {
 
 // Function to view all Employees
 function viewEmployees() {
-    connection.query("SELECT employee.first_name, employee.last_name, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id",
-        (err, results) => {
-            if (err) throw err;
-            console.table(results);
-            start();
+            connection.query("SELECT employee.first_name, employee.last_name, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id",
+                (err, results) => {
+                    if (err) throw err;
+                    console.table(results);
+                    start();
 
-        })
-}
-
-
-
+                })
+        }
+    
+// function to view employees by department
+function viewByDepartm() {
+    inquirer.prompt({
+        name: "departments",
+        type: "list",
+        message: "Employees from which department do you want to see?",
+        choices: [
+            "Sales",
+            "Finance",
+            "Legal",
+            "Engineering"
+        ]
+    })
+        .then(answers => {
+                    connection.query("SELECT employee.first_name, employee.last_name, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id WHERE department.name = ?", {department: answers.departments},
+                    (err, results) => {
+                        if (err) throw err;
+                        console.table(results);
+                        start();
+                    })
+                })
+        }
 
