@@ -56,7 +56,7 @@ function start() {
                     viewByRole();
                     break;
                 case "- Add Employee":
-                    addEmployes();
+                    addEmployee();
                     break;
                 case "- Add Role":
                     addRole();
@@ -72,7 +72,7 @@ function start() {
                     break;
             };
         })
-}
+};
 
 // Function to view  Departments
 function viewDepts() {
@@ -82,7 +82,7 @@ function viewDepts() {
         start();
 
     })
-}
+};
 
 // Function to view Roless
 function viewRoles() {
@@ -93,19 +93,19 @@ function viewRoles() {
             start();
 
         })
-}
+};
 
 // Function to view all Employees
 function viewEmployees() {
-            connection.query("SELECT employee.first_name, employee.last_name, CONCAT(manager.first_name, ' ', manager.last_name) AS manager, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.roles_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id",
-                (err, results) => {
-                    if (err) throw err;
-                    console.table(results);
-                    start();
+    connection.query("SELECT employee.first_name, employee.last_name, CONCAT(manager.first_name, ' ', manager.last_name) AS manager, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.roles_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id",
+        (err, results) => {
+            if (err) throw err;
+            console.table(results);
+            start();
 
-                })
-        }
-    
+        })
+};
+
 // function to view employees by department
 function viewByDepartm() {
     inquirer.prompt({
@@ -120,17 +120,17 @@ function viewByDepartm() {
         ]
     })
         .then(answers => {
-                    connection.query("SELECT employee.first_name, employee.last_name, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.roles_id = roles.id LEFT JOIN department ON roles.department_id = department.id WHERE department.name = ?", [answers.departments],
-                    (err, results) => {
-                        if (err) throw err;
-                        console.table(results);
-                        start();
-                    })
+            connection.query("SELECT employee.first_name, employee.last_name, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.roles_id = roles.id LEFT JOIN department ON roles.department_id = department.id WHERE department.name = ?", [answers.departments],
+                (err, results) => {
+                    if (err) throw err;
+                    console.table(results);
+                    start();
                 })
-        }
+        })
+};
 
 // function to view employees by role
-function viewByRole(){
+function viewByRole() {
     inquirer.prompt({
         name: "roles",
         type: "list",
@@ -146,11 +146,42 @@ function viewByRole(){
         ]
     })
         .then(answers => {
-                    connection.query("SELECT employee.first_name, employee.last_name, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.roles_id = roles.id LEFT JOIN department ON roles.department_id = department.id WHERE roles.title = ?", [answers.roles],
-                    (err, results) => {
-                        if (err) throw err;
-                        console.table(results);
-                        start();
-                    })
+            connection.query("SELECT employee.first_name, employee.last_name, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.roles_id = roles.id LEFT JOIN department ON roles.department_id = department.id WHERE roles.title = ?", [answers.roles],
+                (err, results) => {
+                    if (err) throw err;
+                    console.table(results);
+                    start();
                 })
+        })
+};
+
+// function to add an employee
+function addEmployee() {
+    connection.query("SELECT title FROM roles", (err, results) => {
+        if (err) throw err;
+        let rolesArray = [];
+        for (i = 0; i < results.length; i++) {
+            rolesArray.push(results[i].title);
         }
+        inquirer.prompt([
+            {
+                name: "firstName",
+                type: "input",
+                message: "What is the eployee's first name?"
+            },
+            {
+                name: "lastName",
+                type: "input",
+                message: "What is the eployee's last name?"
+            },
+            {
+                name: "newRole",
+                type: "rawlist",
+                message: "Choose the new employee's role:",
+                choices: rolesArray
+            },
+
+        ])
+    },
+    )
+}
