@@ -268,3 +268,24 @@ function addRole() {
             })
     })
 }
+
+// function to add a new department
+function addDept() {
+    inquirer.prompt({
+        name: "newDept",
+        type: "input",
+        message: "What is the name of a new Department you want to add?",
+    })
+        .then(answers => {
+            connection.query("INSERT INTO department SET ?",
+                {
+                    name: answers.newDept,
+                },
+                (err, results) => {
+                    if (err) throw err;
+                    console.log(`New Department:  ${answers.newDept} is added`);
+                    start();
+                })
+
+        })
+}
