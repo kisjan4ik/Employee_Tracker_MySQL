@@ -161,7 +161,7 @@ function addEmployee() {
         if (err) throw err;
         let rolesArray = [];
         for (i = 0; i < results.length; i++) {
-            rolesArray.push({"title":results[i].title,"id":results[i].id});
+            rolesArray.push({ "title": results[i].title, "id": results[i].id });
         }
         connection.query("SELECT first_name, last_name,id FROM employee",
             (err, results1) => {
@@ -170,7 +170,7 @@ function addEmployee() {
                 for (j = 0; j < results1.length; j++) {
                     let firstName = results1[j].first_name;
                     let lastName = results1[j].last_name;
-                    managerArr.push({'name':firstName + " " + lastName,'id':results1[j].id});
+                    managerArr.push({ 'name': firstName + " " + lastName, 'id': results1[j].id });
                 }
 
                 inquirer.prompt([
@@ -188,20 +188,20 @@ function addEmployee() {
                         name: "newRole",
                         type: "rawlist",
                         message: "Choose the new employee's role:",
-                        choices:rolesArray.map(role=>role.title)
+                        choices: rolesArray.map(role => role.title)
                     },
                     {
                         name: "newManager",
                         type: "rawlist",
                         message: "Choose the new employee's manager:",
-                        choices: managerArr.map(manager=>manager.name)
+                        choices: managerArr.map(manager => manager.name)
                     }
 
                 ])
 
                     .then(answer => {
-                       const managerId = managerArr.filter(manager=>manager.name===answer.newManager);
-                      const roleId = rolesArray.filter(role=>role.title===answer.newRole);
+                        const managerId = managerArr.filter(manager => manager.name === answer.newManager);
+                        const roleId = rolesArray.filter(role => role.title === answer.newRole);
 
                         connection.query("INSERT INTO employee SET ?",
                             {
@@ -220,4 +220,51 @@ function addEmployee() {
             })
     })
 
+}
+
+// function to add a new Role
+function addRole() {
+    connection.query("SELECT name,id FROM department", (err, results) => {
+        if (err) throw err;
+        let departmentArray = [];
+        for (i = 0; i < results.length; i++) {
+            departmentArray.push({ "name": results[i].name, "id": results[i].id });
+        }
+
+        inquirer.prompt([
+            {
+                name: "newRoleName",
+                type: "input",
+                message: "What is the name of the new Role?"
+            },
+            {
+                name: "salary",
+                type: "input",
+                message: "What is salary for the new role (annual)?"
+            },
+            {
+                name: "roleDept",
+                type: "rawlist",
+                message: "Choose the Department for the New role:",
+                choices: departmentArray.map(department => department.name)
+            },
+        ])
+
+            .then(answer => {
+                const departmentId = departmentArray.filter(department => department.name === answer.roleDept);
+
+                connection.query("INSERT INTO roles SET ?",
+                    {
+                        title: answer.newRoleName,
+                        salary: answer.salary,
+                        department_id: departmentId[0].id
+                    },
+
+                    (err, results) => {
+                        if (err) throw err;
+                        console.log(`New role:  ${answer.newRoleName}, with salary of $ ${answer.salary}, added to the ${answer.roleDept}, department`);
+                        start();
+                    })
+            })
+    })
 }
