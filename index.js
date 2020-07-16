@@ -163,25 +163,58 @@ function addEmployee() {
         for (i = 0; i < results.length; i++) {
             rolesArray.push(results[i].title);
         }
-        inquirer.prompt([
-            {
-                name: "firstName",
-                type: "input",
-                message: "What is the eployee's first name?"
-            },
-            {
-                name: "lastName",
-                type: "input",
-                message: "What is the eployee's last name?"
-            },
-            {
-                name: "newRole",
-                type: "rawlist",
-                message: "Choose the new employee's role:",
-                choices: rolesArray
-            },
+        connection.query("SELECT first_name, last_name FROM employee",
+            (err, results1) => {
+                if (err) throw err;
+                let managerArr = [];
+                for (j = 0; j < results1.length; j++) {
+                    let firstName = results1[j].first_name;
+                    let lastName = results1[j].last_name;
+                    managerArr.push(firstName + " " + lastName);
+                }
 
-        ])
-    },
-    )
+                inquirer.prompt([
+                    {
+                        name: "firstName",
+                        type: "input",
+                        message: "What is the eployee's first name?"
+                    },
+                    {
+                        name: "lastName",
+                        type: "input",
+                        message: "What is the eployee's last name?"
+                    },
+                    {
+                        name: "newRole",
+                        type: "rawlist",
+                        message: "Choose the new employee's role:",
+                        choices: rolesArray
+                    },
+                    {
+                        name: "newManager",
+                        type: "rawlist",
+                        message: "Choose the new employee's manager:",
+                        choices: managerArr
+                    }
+
+                ])
+
+                    .then(answer => {
+                        connection.query("INSERT INTO employee SET ?",
+                            {
+                                first_name: answer.firstName,
+                                last_name: answer.lastName,
+                                role_id: (i+1),
+                                manager_id: (j+1)
+                            },
+
+                            (err, results) => {
+                                if (err) throw err;
+                                console.log(`New employee:  ${answer.firstName, answer.lastName, answer.newRole, answer.newManager} added.`);
+                                start();
+                            })
+                    })
+            })
+    })
+
 }

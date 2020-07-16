@@ -27,10 +27,11 @@ CREATE TABLE employee(
   role_id INT NOT NULL,
   CONSTRAINT fk_roles
     FOREIGN KEY (role_id) 
-        REFERENCES role(id)
-  manager_id INT 0,
+        REFERENCES roles(id)
+  manager_id INT default 0,
   CONSTRAINT fk_manager
     FOREIGN KEY (manager_id) 
         REFERENCES employee(id)
   PRIMARY KEY (id)
 );
+
