@@ -302,43 +302,43 @@ function updateRole() {
                 let lastName = results[i].last_name;
                 employeeNewRoleArr.push(firstName + " " + lastName);
             }
-      
-    connection.query("SELECT title,id FROM roles", (err, result) => {
-        if (err) throw err;
-        for (j = 0; j < result.length; j++) {
-            newRoleArray.push(result[j].title);
-        }
-        inquirer.prompt([
-            {
-                name: "updatedEmployee",
-                type: "list",
-                message: "Choose the employee whose role you want to update:",
-                choices: employeeNewRoleArr
-            },
-            {
-                name: "updatedRole",
-                type: "list",
-                message: "Choose the employee's new role:",
-                choices: newRoleArray
-            },
 
-        ]).then(answer => {
-            const roleId = result.filter(role => role.title === answer.updatedRole);
-            let employeeName = answer.updatedEmployee.split(" ")[0];
-            const emplId = emplResult.filter(employee => employee.first_name === employeeName);
-            connection.query("UPDATE employee SET role_id = ? WHERE id = ?",
-                [
-                    roleId[0].id,
-                    emplId[0].id
-                ],
+            connection.query("SELECT title,id FROM roles", (err, result) => {
+                if (err) throw err;
+                for (j = 0; j < result.length; j++) {
+                    newRoleArray.push(result[j].title);
+                }
+                inquirer.prompt([
+                    {
+                        name: "updatedEmployee",
+                        type: "list",
+                        message: "Choose the employee whose role you want to update:",
+                        choices: employeeNewRoleArr
+                    },
+                    {
+                        name: "updatedRole",
+                        type: "list",
+                        message: "Choose the employee's new role:",
+                        choices: newRoleArray
+                    },
 
-                (err, results) => {
-                    if (err) throw err;
-                    console.log(results);
-                    console.log(`Role updated.`);
+                ]).then(answer => {
+                    const roleId = result.filter(role => role.title === answer.updatedRole);
+                    let employeeName = answer.updatedEmployee.split(" ")[0];
+                    const emplId = emplResult.filter(employee => employee.first_name === employeeName);
+                    connection.query("UPDATE employee SET role_id = ? WHERE id = ?",
+                        [
+                            roleId[0].id,
+                            emplId[0].id
+                        ],
+
+                        (err, results) => {
+                            if (err) throw err;
+                            console.log(results);
+                            console.log(`Role updated.`);
                     start();
                 })
+            })
         })
     })
-})
 }
