@@ -97,7 +97,7 @@ function viewRoles() {
 
 // Function to view all Employees
 function viewEmployees() {
-    connection.query("SELECT employee.first_name, employee.last_name, CONCAT(manager.first_name, ' ', manager.last_name) AS manager, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.roles_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id",
+    connection.query("SELECT employee.first_name, employee.last_name, CONCAT(manager.first_name, ' ', manager.last_name) AS manager, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN employee manager ON manager.id = employee.manager_id",
         (err, results) => {
             if (err) throw err;
             console.table(results);
@@ -120,7 +120,7 @@ function viewByDepartm() {
         ]
     })
         .then(answers => {
-            connection.query("SELECT employee.first_name, employee.last_name, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.roles_id = roles.id LEFT JOIN department ON roles.department_id = department.id WHERE department.name = ?", [answers.departments],
+            connection.query("SELECT employee.first_name, employee.last_name, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id WHERE department.name = ?", [answers.departments],
                 (err, results) => {
                     if (err) throw err;
                     console.table(results);
@@ -146,7 +146,7 @@ function viewByRole() {
         ]
     })
         .then(answers => {
-            connection.query("SELECT employee.first_name, employee.last_name, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.roles_id = roles.id LEFT JOIN department ON roles.department_id = department.id WHERE roles.title = ?", [answers.roles],
+            connection.query("SELECT employee.first_name, employee.last_name, roles.title, department.name FROM roles RIGHT JOIN employee ON employee.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id WHERE roles.title = ?", [answers.roles],
                 (err, results) => {
                     if (err) throw err;
                     console.table(results);
