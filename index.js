@@ -290,41 +290,43 @@ function addDept() {
 
 // function to update an employee role
 function updateRole() {
-    connection.query("SELECT first_name, last_name FROM employee",
+    let employeeNewRoleArr = [];
+    let newRoleArray = [];
+    let emplResult = [];
+    connection.query("SELECT id, first_name, last_name FROM employee",
         (err, results) => {
+            emplResult = results
             if (err) throw err;
-            let employeeNewRoleArr = [];
             for (i = 0; i < results.length; i++) {
                 let firstName = results[i].first_name;
                 let lastName = results[i].last_name;
-                employeeNewRoleArr.push({ 'name': firstName + " " + lastName, 'id': results[i].id});
+                employeeNewRoleArr.push(firstName + " " + lastName);
             }
-        })
+      
     connection.query("SELECT title,id FROM roles", (err, result) => {
         if (err) throw err;
-        let newRoleArray = [];
         for (j = 0; j < result.length; j++) {
-            newRoleArray.push({ "title": result[j].title, "id": result[j].id });
+            newRoleArray.push(result[j].title);
         }
         inquirer.prompt([
             {
                 name: "updatedEmployee",
-                type: "rawlist",
+                type: "list",
                 message: "Choose the employee whose role you want to update:",
-                choices: employeeNewRoleArr.map(employee => employee.name)
+                choices: employeeNewRoleArr
             },
             {
                 name: "updatedRole",
-                type: "rawlist",
+                type: "list",
                 message: "Choose the employee's new role:",
-                choices: newRoleArray.map(role => role.title)
+                choices: newRoleArray
             },
 
         ]).then(answer => {
-            const roleId = newRoleArray.filter(role => role.title === answer.updatedRole);
-            const emplId = employeeNewRoleArr.filter(employee => employee.name === answer.updatedEmployee)
-
-            connection.query("UPDATE employee SET role_id = ? WHERE employee.id = ?",
+            const roleId = result.filter(role => role.title === answer.updatedRole);
+            let employeeName = answer.updatedEmployee.split(" ")[0];
+            const emplId = emplResult.filter(employee => employee.first_name === employeeName);
+            connection.query("UPDATE employee SET role_id = ? WHERE id = ?",
                 [
                     roleId[0].id,
                     emplId[0].id
@@ -332,9 +334,11 @@ function updateRole() {
 
                 (err, results) => {
                     if (err) throw err;
-                    console.log(`New Role:  ${answer.newRole}, for ${answer.firstName}, ${answer.lastName} added.`);
+                    console.log(results);
+                    console.log(`Role updated.`);
                     start();
                 })
         })
     })
+})
 }
