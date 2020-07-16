@@ -157,20 +157,20 @@ function viewByRole() {
 
 // function to add an employee
 function addEmployee() {
-    connection.query("SELECT title FROM roles", (err, results) => {
+    connection.query("SELECT title,id FROM roles", (err, results) => {
         if (err) throw err;
         let rolesArray = [];
         for (i = 0; i < results.length; i++) {
-            rolesArray.push(results[i].title);
+            rolesArray.push({"title":results[i].title,"id":results[i].id});
         }
-        connection.query("SELECT first_name, last_name FROM employee",
+        connection.query("SELECT first_name, last_name,id FROM employee",
             (err, results1) => {
                 if (err) throw err;
                 let managerArr = [];
                 for (j = 0; j < results1.length; j++) {
                     let firstName = results1[j].first_name;
                     let lastName = results1[j].last_name;
-                    managerArr.push(firstName + " " + lastName);
+                    managerArr.push({'name':firstName + " " + lastName,'id':results1[j].id});
                 }
 
                 inquirer.prompt([
@@ -188,29 +188,32 @@ function addEmployee() {
                         name: "newRole",
                         type: "rawlist",
                         message: "Choose the new employee's role:",
-                        choices: rolesArray
+                        choices:rolesArray.map(role=>role.title)
                     },
                     {
                         name: "newManager",
                         type: "rawlist",
                         message: "Choose the new employee's manager:",
-                        choices: managerArr
+                        choices: managerArr.map(manager=>manager.name)
                     }
 
                 ])
 
                     .then(answer => {
+                       const managerId = managerArr.filter(manager=>manager.name===answer.newManager);
+                      const roleId = rolesArray.filter(role=>role.title===answer.newRole);
+
                         connection.query("INSERT INTO employee SET ?",
                             {
                                 first_name: answer.firstName,
                                 last_name: answer.lastName,
-                                role_id: (i+1),
-                                manager_id: (j+1)
+                                role_id: roleId[0].id,
+                                manager_id: managerId[0].id
                             },
 
                             (err, results) => {
                                 if (err) throw err;
-                                console.log(`New employee:  ${answer.firstName, answer.lastName, answer.newRole, answer.newManager} added.`);
+                                console.log(`New employee:  ${answer.firstName}, ${answer.lastName}, ${answer.newRole}, ${answer.newManager} added.`);
                                 start();
                             })
                     })
